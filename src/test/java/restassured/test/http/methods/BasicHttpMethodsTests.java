@@ -1,4 +1,4 @@
-package http.methods;
+package restassured.test.http.methods;
 
 import org.testng.annotations.Test;
 import pl.javastart.main.pojo.Category;
