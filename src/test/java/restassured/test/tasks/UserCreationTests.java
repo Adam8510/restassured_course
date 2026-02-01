@@ -5,7 +5,7 @@ import pl.javastart.main.pojo.User;
 
 import static io.restassured.RestAssured.given;
 
-public class UserCreationTests {
+public class UserCreationTests extends TestBase {
     @Test
     public void givenCorrectUserDataWhenCreateUserThenUserIsCreatedTest() {
 
@@ -18,15 +18,15 @@ public class UserCreationTests {
         user.setPassword("password");
         user.setPhone("+123456789");
         user.setUserStatus(123);
-        given().log().all()
+        given()
                 .contentType("application/json")
                 .body(user)
-                .when().post("https://swaggerpetstore.przyklady.javastart.pl/v2/user")
-                .then().log().all().statusCode(200);
+                .when().post("user")
+                .then().statusCode(200);
 
-        given().log().all()
+        given()
                 .pathParam("username", user.getUsername())
-                .when().get("https://swaggerpetstore.przyklady.javastart.pl/v2/user/{username}")
-                .then().log().all().statusCode(200);
+                .when().get("user/{username}")
+                .then().statusCode(200);
     }
 }

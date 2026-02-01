@@ -11,7 +11,7 @@ import java.util.Collections;
 import static io.restassured.RestAssured.given;
 import static org.testng.Assert.assertEquals;
 
-public class Task5_8 {
+public class Task5_8 extends TestBase{
     @Test
     public void givenPetWhenPostPetThenPetIsCreatedTest() {
         Category category = new Category();
@@ -30,12 +30,12 @@ public class Task5_8 {
         pet.setStatus("available");
 
         given().log().all().body(pet).contentType("application/json")
-                .when().post("https://swaggerpetstore.przyklady.javastart.pl/v2/pet")
+                .when().post("pet")
                 .then().log().all().statusCode(200);
 
         JsonPath jsonPathResponse = given().log().method().log().uri()
                 .pathParam("petId", pet.getId())
-                .when().get("https://swaggerpetstore.przyklady.javastart.pl/v2/pet/{petId}")
+                .when().get("pet/{petId}")
                 .then().log().all().statusCode(200)
                 .extract().jsonPath();
 
@@ -45,6 +45,6 @@ public class Task5_8 {
 
         assertEquals(petName, pet.getName(), "Pet name");
         assertEquals(actualCategoryName, pet.getCategory().getName(), "Category name");
-        assertEquals(tagName, pet.getTags().get(0).getName(), "Pet tag name");
+        assertEquals(tagName, pet.getName(), "Pet tag name");
     }
 }
