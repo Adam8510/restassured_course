@@ -1,16 +1,21 @@
 package restassured.test.serialization;
 
+import io.restassured.http.Headers;
+import io.restassured.response.Response;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 import pl.javastart.main.pojo.Category;
 import pl.javastart.main.pojo.Pet;
 import pl.javastart.main.pojo.Tag;
+import restassured.test.tasks.TestBase;
 
 import java.util.Collections;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.*;
 
-public class SerializationAndDeserializationTests {
+public class SerializationAndDeserializationTests extends TestBase {
     @Test
     public void givenPetWhenPostPetThenPetIsCreatedTest() {
 
@@ -29,10 +34,25 @@ public class SerializationAndDeserializationTests {
         pet.setTags(Collections.singletonList(tag));
         pet.setStatus("available");
 
-        Pet actualPet = given().log().all().body(pet).contentType("application/json")
+        Pet actualPet = given().body(pet).contentType("application/json")
                 .when().post("https://swaggerpetstore.przyklady.javastart.pl/v2/pet")
-                .then().log().all().statusCode(200)
+                .then().statusCode(200)
                 .extract().as(Pet.class);
+
+        Response response = given().body(pet).contentType("application/json")
+                        .when().post("https://swaggerpetstore.przyklady.javastart.pl/v2/pet")
+                        .then().extract().response();
+
+        int statusCode = response.getStatusCode();
+        String statusLine = response.getStatusLine();
+        Headers responseHeaders = response.getHeaders();
+        Map<String, String> cookies = response.getCookies();
+        assertEquals(statusLine, "HTTP/1.1 200 OK", "Status Line");
+        assertEquals(statusCode, 200, "StatusCode");
+        assertNotNull(responseHeaders.get("Date"));
+        assertEquals(responseHeaders.get("Content-Type").getValue(), "application/json", "Content type header");
+        assertEquals(responseHeaders.get("Server").getValue(), "nginx/1.10.3", "Server header");
+        assertTrue(cookies.isEmpty(), "Cookies are empty");
 
         assertEquals(actualPet.getId(), pet.getId(), "Pet id");
         assertEquals(actualPet.getCategory().getId(), pet.getCategory().getId(), "Category id");
@@ -63,15 +83,15 @@ public class SerializationAndDeserializationTests {
         //Zadanie 5.7
         // Najpierw stworzyć zwierzę przy pomocy endpointa /pet
         // Sprawdzić, czy zwierzę zostało stworzone przez asercję na kodzie statusowym metody POST
-        given().log().all().body(pet).contentType("application/json")
+        given().body(pet).contentType("application/json")
                 .when().post("https://swaggerpetstore.przyklady.javastart.pl/v2/pet")
-                .then().log().all().statusCode(200);
+                .then().statusCode(200);
 
         //Następnie wykonać żądanie metodą GET i sprawdzić, czy zwrócony obiekt jest taki sam jak zdeserializowany obiekt
-        Pet actualPet = given().log().all().log().uri()
+        Pet actualPet = given().log().uri()
                 .pathParam("petId", pet.getId())
                 .when().get("https://swaggerpetstore.przyklady.javastart.pl/v2/pet/{petId}")
-                .then().log().all().statusCode(200)
+                .then().statusCode(200)
                 .extract().as(Pet.class);
 
         assertEquals(actualPet.getId(), pet.getId(), "Pet id");

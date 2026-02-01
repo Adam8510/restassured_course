@@ -15,7 +15,7 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
-public class QueryParamsTests {
+public class QueryParamsTests extends TestBase{
     @Test
     public void givenExistingPetWithStatusSoldWhenGetPetWithSoldStatusThenPetWithStatusIsReturnedTest() {
         Category category = new Category();
@@ -34,12 +34,12 @@ public class QueryParamsTests {
         pet.setStatus("sold");
 
         given().log().all().body(pet).contentType("application/json")
-                .when().post("https://swaggerpetstore.przyklady.javastart.pl/v2/pet")
+                .when().post("pet")
                 .then().log().all().statusCode(200);
 
         Pet[] pets = given().log().all().body(pet).contentType("application/json")
                 .queryParam("status", "sold")
-                .when().get("https://swaggerpetstore.przyklady.javastart.pl/v2/pet/findByStatus")
+                .when().get("pet/findByStatus")
                 .then().log().all().statusCode(200).extract().as(Pet[].class);
 
         assertTrue(Arrays.asList(pets).size() > 0, "List of pets");
@@ -47,13 +47,13 @@ public class QueryParamsTests {
 
         String actualCategoryName = given().log().method().log().uri()
                 .pathParam("petId", pet.getId())
-                .when().get("https://swaggerpetstore.przyklady.javastart.pl/v2/pet/{petId}")
+                .when().get("pet/{petId}")
                 .then().log().all().statusCode(200)
                 .extract().jsonPath().getString("category.name");
 
         List<Pet> pets1 = given().log().all().body(pet).contentType("application/json")
                 .queryParam("status", "sold")
-                .when().get("https://swaggerpetstore.przyklady.javastart.pl/v2/pet/findByStatus")
+                .when().get("pet/findByStatus")
                 .then().log().all().statusCode(200).extract().jsonPath().getList("", Pet.class);
 
         assertTrue(pets1.size() > 0, "List of pets");
@@ -79,12 +79,12 @@ public class QueryParamsTests {
 
 
         given().log().all().body(pet).contentType("application/json")
-                .when().post("https://swaggerpetstore.przyklady.javastart.pl/v2/pet")
+                .when().post("pet")
                 .then().log().all().statusCode(200);
 
         JsonPath jsonPathResponse = given().log().method().log().uri()
                 .pathParam("petId", pet.getId())
-                .when().get("https://swaggerpetstore.przyklady.javastart.pl/v2/pet/{petId}")
+                .when().get("pet/{petId}")
                 .then().log().all().statusCode(200)
                 .extract().jsonPath();
 

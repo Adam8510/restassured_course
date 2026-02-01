@@ -5,7 +5,7 @@ import pl.javastart.main.pojo.User;
 
 import static io.restassured.RestAssured.given;
 
-public class UpdateUserTests {
+public class UserUpdateTests extends TestBase {
     @Test
     public void givenCorrectUserDataWhenFirstNameLastNameAreUpdatedThenUserDataIsUpdatedTest() {
 
@@ -20,27 +20,27 @@ public class UpdateUserTests {
         user.setUserStatus(123);
 
         //1. Stworzyć użytkownika metodą POST
-        given().log().all()
+        given()
                 .contentType("application/json")
-                        .body(user)
-                                .when().post("https://swaggerpetstore.przyklady.javastart.pl/v2/user")
-                        .then().log().all().statusCode(200);
+                .body(user)
+                .when().post("user")
+                .then().statusCode(200);
 
         //2. Zaktualizować, użytkownika. Aktualizacji powinny ulec tylko firstname oraz lastname (dowolne poprawne wartości
         user.setFirstName("Adam");
         user.setLastName("Malinowski");
 
-        given().log().all()
+        given()
                 .contentType("application/json")
                 .pathParam("username", user.getUsername())
                 .body(user)
-                .when().put("https://swaggerpetstore.przyklady.javastart.pl/v2/user/{username}")
-                .then().log().all().statusCode(200);
+                .when().put("user/{username}")
+                .then().statusCode(200);
 
         //3. Sprawdzić, że użytkownik istnieje po aktualizacji, metodą GET
-        given().log().all()
+        given()
                 .pathParam("username", user.getUsername())
-                .when().get("https://swaggerpetstore.przyklady.javastart.pl/v2/user/{username}")
-                .then().log().all().statusCode(200);
+                .when().get("user/{username}")
+                .then().statusCode(200);
     }
 }
